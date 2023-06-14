@@ -3,7 +3,7 @@ from pyspeckit.spectrum.models import model
 from pyspeckit.spectrum.models.ammonia_constants import line_names
 
 
-from models import ammonia as nh3
+from . import ammonia as nh3
 
 '''
 ========================================
