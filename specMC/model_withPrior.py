@@ -7,7 +7,6 @@ Generic SpectralModel wrapper
 Module API
 ^^^^^^^^^^
 """
-from matplotlib import pyplot as plt
 import numpy as np
 import scipy
 import scipy.stats
@@ -16,13 +15,13 @@ from pyspeckit.spectrum.parinfo import ParinfoList,Parinfo
 import copy
 from astropy import log
 import matplotlib.cbook as mpcb
-from . import fitter
-from . import mpfit_messages
+#from . import fitter
+#from . import mpfit_messages
+from pyspeckit.spectrum.models import fitter
+from pyspeckit.spectrum.models import mpfit_messages
 from pyspeckit.specwarnings import warn
 import itertools
 import operator
-from scipy.stats import multivariate_normal
-from scipy.stats import sem
 import six
 try:
     from collections import OrderedDict
@@ -870,16 +869,11 @@ class SpectralModel(fitter.SimpleFitter):
         totallogprob = np.sum(logprob)
         return totallogprob
 
-    def priorfn(self, priorvals, pars=None):
+    def priorfn( self, priorvals, pars=None):
         """
         Returns the multivariate normal prior of the model.
         """
-        #if pars is None:
-           # pars = self.parinfo
-        #else:
-        #if "gaussian": 
         priorvals["steps"]= priorvals["steps"]+1
-        #delete this
         print(priorvals["steps"])
         prior=scipy.stats.multivariate_normal.pdf(pars , mean=priorvals["mean"], cov=priorvals["cov"])
         return prior
@@ -953,8 +947,11 @@ class SpectralModel(fitter.SimpleFitter):
         except ImportError:
             return
 
+        
         def probfunc(pars):
+            print(self)
             return self.logp(xarr, data, error, pars=pars) + np.log(self.priorfn(priorvals, pars=pars))
+        
         filename='./Results/mcmcresults.h5'
         backend= emcee.backends.HDFBackend(filename)
         backend.reset(nwalkers, self.npars*self.npeaks+self.vheight)

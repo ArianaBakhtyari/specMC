@@ -1,9 +1,9 @@
 #This manipulates the data in runScript.py
 import os
 import sys
-sys.path.append(f"{os.getenv('STEM')}/pyspeckit-IncorporatePrior")
+from typing import Any
+#sys.path.append(f"{os.getenv('STEM')}/pyspeckit-IncorporatePrior")
 import pyspeckit
-
 from astropy import units as u
 from astropy.io import fits
 from spectral_cube import SpectralCube
@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import emcee
 import numpy as np
 from models import ammonia, ammonia_fixfortho
+from fitters_withPrior import Specfit 
 
 
 class SpecModel:
@@ -244,7 +245,7 @@ class SpecModel:
             cubes.fiteach(fittype=fittype, guesses=guesses)
             cubes.plotter()
             cubes.specfit.plot_fit()
-        plt.savefig(f'./Graphs/{fittype}plot.png')
+        plt.savefig(f'./Results/{fittype}plot.png')
 
 #this function breaks. Fit must always be True
     def noFit(self,guesses):
@@ -270,7 +271,8 @@ class SpecModel:
         self.nbins=self.ndim *self.ncomp
         self.nwalkers=self.Walkers
         self.nsteps=self.steps
-        self.emcee_ensemble= self.sp.specfit.get_emcee(self.proto_gauss_prior()) 
+        self.emcee_ensemble= Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior)
+        #self.emcee_ensemble= self.sp.specfit.get_emcee(self.proto_gauss_prior()) 
         #HARD CODED EXAMPLE: 
         #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
         self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nbins)

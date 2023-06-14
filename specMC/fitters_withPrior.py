@@ -1,4 +1,5 @@
 from __future__ import print_function
+from typing import Any
 import matplotlib
 import numpy as np
 import copy
@@ -9,15 +10,24 @@ from astropy import log
 from astropy import units as u
 from six.moves import xrange
 from six import string_types
+from pyspeckit.config import mycfg
+#from ..config import mycfg
+from pyspeckit.config import ConfigDescriptor as cfgdec
+#from ..config import ConfigDescriptor as cfgdec
+from pyspeckit.spectrum import units
+from pyspeckit.spectrum import models
+#from . import units
+#from . import models
+from pyspeckit.specwarnings import warn
+from pyspeckit.spectrum import interactive
+from pyspeckit.spectrum import history
+from pyspeckit.spectrum import widgets
+#from ..specwarnings import warn
+#from . import interactive
+#from . import history
+#from . import widgets
+from model_withPrior import SpectralModel as spectral_Mod
 
-from ..config import mycfg
-from ..config import ConfigDescriptor as cfgdec
-from . import units
-from . import models
-from ..specwarnings import warn
-from . import interactive
-from . import history
-from . import widgets
 
 class Registry(object):
     """
@@ -142,7 +152,6 @@ default_Registry.add_fitter('voigt',models.voigt_fitter(),4,key='v')
 default_Registry.add_fitter('lorentzian',models.lorentzian_fitter(),3,key='L')
 #default_Registry.add_fitter('hill5',models.hill5infall.hill5_fitter,5)
 #default_Registry.add_fitter('hcn',models.hcn.hcn_vtau_fitter,4)
-
 
 class Specfit(interactive.Interactive):
 
@@ -1954,12 +1963,15 @@ class Specfit(interactive.Interactive):
         >>> pos,logprob,state = emcee_ensemble.run_mcmc(p0,100)
         """
         import emcee
-
+        
         if hasattr(self.fitter,'get_emcee_ensemblesampler'):
             nwalkers = (self.fitter.npars * self.fitter.npeaks + self.fitter.vheight) * 2
-            emc = self.fitter.get_emcee_ensemblesampler(self.Spectrum.xarr,
+            emc =spectral_Mod.get_emcee_ensemblesampler(self.fitter, self.Spectrum.xarr,
                                                         self.spectofit,
                                                         self.errspec, nwalkers, priorvals)
+            #emc = self.fitter.get_emcee_ensemblesampler(self.Spectrum.xarr,
+                                                        #self.spectofit,
+                                                        #self.errspec, nwalkers, priorvals)
             emc.nwalkers = nwalkers
             emc.p0 = np.array([self.parinfo.values] * emc.nwalkers)
             return emc
