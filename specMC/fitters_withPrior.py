@@ -1948,7 +1948,7 @@ class Specfit(interactive.Interactive):
         error : np.ndarray
         nwalkers : int
             Number of walkers to use.  Defaults to 2 * self.fitters.npars
-
+        priorvals:dictionary consisting of steps (int) , mean(float), and covariance (float)
         Examples
         --------
 
@@ -1969,9 +1969,6 @@ class Specfit(interactive.Interactive):
             emc =spectral_Mod.get_emcee_ensemblesampler(spectral_Mod.fitter, self.Spectrum.xarr,
                                                         self.spectofit,
                                                         self.errspec, nwalkers, priorvals)
-            #emc = self.fitter.get_emcee_ensemblesampler(self.Spectrum.xarr,
-                                                        #self.spectofit,
-                                                        #self.errspec, nwalkers, priorvals)
             emc.nwalkers = nwalkers
             emc.p0 = np.array([self.parinfo.values] * emc.nwalkers)
             return emc

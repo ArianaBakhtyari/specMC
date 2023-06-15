@@ -4,7 +4,7 @@
 
         1. git clone {github address} 
         2. pip install -r requirements.txt
-       _make sure you have atleast python version 3.6 installed_
+        (make sure you have atleast python version 3.6 installed)
         3. python setup.py install
 
 ## General Instructions

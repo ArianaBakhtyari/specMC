@@ -1,19 +1,31 @@
-#This file creates all the different plots to analyze the models in runScript.py
+
+"""
+This file creates all necessary plots to further aanalyze the data
+"""
 import corner
 import numpy as np
 import matplotlib.pyplot as plt
 
 def plotCorner(emcee_ensemble, nameOfFile, titles):
+    """ 
+    This function plots the original
+    """
     corner.corner(emcee_ensemble.flatchain);
     plt.figure(corner.corner(emcee_ensemble.flatchain, labels = titles))
     plt.savefig(f'./Results/{nameOfFile}.png')
 
 def plotBurnCorner(flatchain, nameOfFile, titles):
+    """
+    This function plots the corner plots with the corresponding burn-in values
+    """
     corner.corner(flatchain);
     plt.figure(corner.corner(flatchain, labels = titles))
     plt.savefig(f'./Results/{nameOfFile}.png')
 
 def plotMSP(emcee_ensemble,titles, nbins):
+        """
+        This function plots the Median and Standard deviation histograms for each component
+        """
         values=[]
         medVals=[]
         stdVals=[]
@@ -34,6 +46,9 @@ def plotMSP(emcee_ensemble,titles, nbins):
         plt.savefig("./Results/MedianStdPlots.png")
 
 def plotSubplots(emcee_ensemble, titles, nameOfFile):
+        """
+        This function plots each components value with respect to each step
+        """
         walker_to_inspect=0 # index of walker
         median_lnpost = np.median(emcee_ensemble.lnprobability[walker_to_inspect,:])
         plt.figure(figsize=(15,7))
@@ -53,6 +68,9 @@ def plotSubplots(emcee_ensemble, titles, nameOfFile):
 
 
 def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOfFile):
+        """
+        This function plots each components value with respect to the remaining steps after rejecting a certain number of steps
+        """
         stb = steps_to_burn
         walker_to_inspect=0 # index of walker
         if burn_setting is "before":

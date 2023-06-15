@@ -874,7 +874,6 @@ class SpectralModel(fitter.SimpleFitter):
         Returns the multivariate normal prior of the model.
         """
         priorvals["steps"]= priorvals["steps"]+1
-        print(priorvals["steps"])
         prior=scipy.stats.multivariate_normal.pdf(pars , mean=priorvals["mean"], cov=priorvals["cov"])
         return prior
 
