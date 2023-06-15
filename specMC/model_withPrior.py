@@ -869,12 +869,14 @@ class SpectralModel(fitter.SimpleFitter):
         totallogprob = np.sum(logprob)
         return totallogprob
 
-    def priorfn( self, priorvals, pars=None):
+    def priorfn(self, priorvals, pars=None):
         """
         Returns the multivariate normal prior of the model.
         """
         priorvals["steps"]= priorvals["steps"]+1
-        print(priorvals["steps"])
+        if priorvals["steps"]%1000==0:
+            # print every thousand steps
+            print(priorvals["steps"])
         prior=scipy.stats.multivariate_normal.pdf(pars , mean=priorvals["mean"], cov=priorvals["cov"])
         return prior
 
