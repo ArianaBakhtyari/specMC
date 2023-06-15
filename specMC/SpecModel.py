@@ -236,8 +236,12 @@ class SpecModel:
         # AttributeError: The 'specfit' object has no 'fitter' yet.  This means you haven't yet run a fit.
         # The fitter is not accessible until after a fit has been run.
         self.sp = self.sp.get_spectrum(x, y)
+
+        #  replace the  pyspeckit Specfit object with the one fromt his package
+        self.sp.specfit = Specfit(self.sp, self.sp.Registry)
         self.sp.specfit.register_fitter(self.fittype, fitter, fitter.npars)
         self.sp.specfit(fittype=self.fittype, guesses=guesses)
+
 
     def fit(self, fittype, guesses):
         self.guesses = guesses
@@ -298,7 +302,7 @@ class SpecModel:
         self.nwalkers=self.Walkers
         self.nsteps=self.steps
         #self.emcee_ensemble= Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior) #commented out by mchen
-        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior, self.nwalkers)
+        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers)
         #self.emcee_ensemble = Specfit(self.sp).get_emcee(self.proto_gauss_prior, self.nwalkers)
 
         #self.emcee_ensemble= self.sp.specfit.get_emcee(self.proto_gauss_prior()) 
