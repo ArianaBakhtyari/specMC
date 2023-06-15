@@ -949,7 +949,6 @@ class SpectralModel(fitter.SimpleFitter):
 
         
         def probfunc(pars):
-            print(self)
             return self.logp(xarr, data, error, pars=pars) + np.log(self.priorfn(priorvals, pars=pars))
 
         if savename is None:
