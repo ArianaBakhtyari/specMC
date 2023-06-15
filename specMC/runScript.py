@@ -7,13 +7,14 @@ from plots import *
 class Run():
     print("Starting")
     print("creating model")
-    if exists(sys.argv[4]):
-        M=SpecModel([sys.argv[1], sys.argv[4]], sys.argv[2])
-    elif exists(sys.argv[4]) == False:
-       M=SpecModel([sys.argv[1]], sys.argv[2])
-    else:
-        print("error")
-        exit()
+    try:
+        if exists(sys.argv[4]):
+            M=SpecModel([sys.argv[1], sys.argv[4]], sys.argv[2])
+        elif exists(sys.argv[4]) == False:
+            M=SpecModel([sys.argv[1]], sys.argv[2])
+    except IndexError as e:
+        M=SpecModel([sys.argv[1]], sys.argv[2])
+
 
     guess=sys.argv[3].split(',')
     guess = [float(n) for n in guess]

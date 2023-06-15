@@ -131,16 +131,16 @@ class SpecModel:
             self.prior=[]    
             guess=sys.argv[3].split(',')
             guess = [float(n) for n in guess]
-            self.sampleball.append(self.toAnArrayOfInt(sys.argv[5])) #p0
-            self.sampleball.append(self.toAnArrayOfInt(sys.argv[6])) #std
-            self.prior.append(self.toAnArrayOfInt(sys.argv[7])) #prior
-            self.prior.append(self.toAnArrayOfInt(sys.argv[8])) #error
-            self.Fit=sys.argv[9] #fit
-            self.x0=int(sys.argv[10]) #x0
-            self.y0=int(sys.argv[11]) #y0
-            self.Walkers=int(sys.argv[12]) #walkers
-            self.steps=int(sys.argv[13]) #steps
-            self.Burn=int(sys.argv[14]) #burnin
+            self.sampleball.append(self.toAnArrayOfInt(sys.argv[len(arguments)-10])) #p0
+            self.sampleball.append(self.toAnArrayOfInt(sys.argv[len(arguments)-9])) #std
+            self.prior.append(self.toAnArrayOfInt(sys.argv[len(arguments)-8])) #prior
+            self.prior.append(self.toAnArrayOfInt(sys.argv[len(arguments)-7])) #error
+            self.Fit=sys.argv[len(arguments)-6] #fit
+            self.x0=int(sys.argv[len(arguments)-5]) #x0
+            self.y0=int(sys.argv[len(arguments)-4]) #y0
+            self.Walkers=int(sys.argv[len(arguments)-3]) #walkers
+            self.steps=int(sys.argv[len(arguments)-2]) #steps
+            self.Burn=int(sys.argv[len(arguments)-1]) #burnin
 
     def toAnArrayOfInt(self, inputString):
         array=inputString.split(',')
@@ -298,7 +298,7 @@ class SpecModel:
 
     def runEmcee(self, array):
         self.ndim= len(array)
-        self.nbins=self.ndim *self.ncomp
+        self.nbins=self.ndim * 2
         self.nwalkers=self.Walkers
         self.nsteps=self.steps
         #self.emcee_ensemble= Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior) #commented out by mchen
