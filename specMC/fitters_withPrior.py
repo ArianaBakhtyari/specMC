@@ -26,7 +26,7 @@ from pyspeckit.spectrum import widgets
 #from . import interactive
 #from . import history
 #from . import widgets
-from model_withPrior import SpectralModel as spectral_Mod
+from .model_withPrior import SpectralModel as spectral_Mod
 
 
 class Registry(object):
@@ -1965,8 +1965,11 @@ class Specfit(interactive.Interactive):
         import emcee
         
         if hasattr(self.fitter,'get_emcee_ensemblesampler'):
-            nwalkers = (self.fitter.npars * self.fitter.npeaks + self.fitter.vheight) * 2
-            emc =spectral_Mod.get_emcee_ensemblesampler(spectral_Mod.fitter, self.Spectrum.xarr,
+            if nwalkers is None:
+                nwalkers = (self.fitter.npars * self.fitter.npeaks + self.fitter.vheight) * 2
+
+            emc =spectral_Mod.get_emcee_ensemblesampler(self.fitter, self.Spectrum.xarr,
+
                                                         self.spectofit,
                                                         self.errspec, nwalkers, priorvals)
             emc.nwalkers = nwalkers
