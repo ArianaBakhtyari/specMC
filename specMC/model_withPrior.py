@@ -916,7 +916,7 @@ class SpectralModel(fitter.SimpleFitter):
 
         return sampler
 
-    def get_emcee_ensemblesampler(self, xarr, data, error, nwalkers, priorvals, **kwargs):
+    def get_emcee_ensemblesampler(self, xarr, data, error, nwalkers, priorvals, savename=None, **kwargs):
         """
         Get an emcee walker ensemble for the data & model
 
@@ -951,9 +951,10 @@ class SpectralModel(fitter.SimpleFitter):
         def probfunc(pars):
             print(self)
             return self.logp(xarr, data, error, pars=pars) + np.log(self.priorfn(priorvals, pars=pars))
-        
-        filename='./Results/mcmcresults.h5'
-        backend= emcee.backends.HDFBackend(filename)
+
+        if savename is None:
+            savename='mcmcresults.h5'
+        backend= emcee.backends.HDFBackend(savename)
         backend.reset(nwalkers, self.npars*self.npeaks+self.vheight)
         sampler = emcee.EnsembleSampler(nwalkers,
                                         self.npars*self.npeaks+self.vheight,
