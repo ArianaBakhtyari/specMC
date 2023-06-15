@@ -213,6 +213,36 @@ class SpecModel:
         print(pcubea)
         return cubea
 
+    def get_sp(self, x, y, guesses):
+        # need a way to
+        pcube1a = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
+        pcube1a.xarr.velocity_convention = 'radio'
+        pcube1a.xarr.convert_to_unit("km/s")
+        pcube2a = pyspeckit.Cube(cube=self.cube2a)  # , xO=self.x0, yO=self.y0)
+        pcube2a.xarr.velocity_convention = 'radio'
+        pcube2a.xarr.convert_to_unit("km/s")
+        cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
+
+        if self.fittype == 'fixfortho':
+            print(self.fittype)
+            fitter = ammonia_fixfortho.nh3_fixfortho_model(n_comp=self.ncomp)
+        elif self.fittype == 'multiv':
+            print(self.fittype)
+            fitter = ammonia.nh3_multi_v_model_generator(n_comp=self.ncomp)
+
+        self.sp = cubes
+        self.sp.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+
+        # AttributeError: The 'specfit' object has no 'fitter' yet.  This means you haven't yet run a fit.
+        # The fitter is not accessible until after a fit has been run.
+        self.sp = self.sp.get_spectrum(x, y)
+
+        #  replace the  pyspeckit Specfit object with the one fromt his package
+        self.sp.specfit = Specfit(self.sp, self.sp.Registry)
+        self.sp.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+        self.sp.specfit(fittype=self.fittype, guesses=guesses)
+
+
     def fit(self, fittype, guesses):
         self.guesses = guesses
         if self.model ==1:
@@ -271,14 +301,19 @@ class SpecModel:
         self.nbins=self.ndim * 2
         self.nwalkers=self.Walkers
         self.nsteps=self.steps
-        self.emcee_ensemble= Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior)
+        #self.emcee_ensemble= Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior) #commented out by mchen
+        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers)
+        #self.emcee_ensemble = Specfit(self.sp).get_emcee(self.proto_gauss_prior, self.nwalkers)
+
         #self.emcee_ensemble= self.sp.specfit.get_emcee(self.proto_gauss_prior()) 
         #HARD CODED EXAMPLE: 
         #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
-        self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nbins)
+
+        #self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nbins) #commented out by mchen
+        self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nwalkers)
         print(self.p0.shape)
         print("Running emcee")
-        self.emcee_ensemble.run_mcmc(self.p0,self.nsteps)
+        self.emcee_ensemble.run_mcmc(self.p0, self.nsteps)
 
     def proto_gauss_prior(self):
         self.priorvals={}

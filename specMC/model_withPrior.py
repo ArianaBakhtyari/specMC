@@ -869,12 +869,14 @@ class SpectralModel(fitter.SimpleFitter):
         totallogprob = np.sum(logprob)
         return totallogprob
 
-    def priorfn( self, priorvals, pars=None):
+    def priorfn(self, priorvals, pars=None):
         """
         Returns the multivariate normal prior of the model.
         """
         priorvals["steps"]= priorvals["steps"]+1
-        print(priorvals["steps"])
+        if priorvals["steps"]%1000==0:
+            # print every thousand steps
+            print(priorvals["steps"])
         prior=scipy.stats.multivariate_normal.pdf(pars , mean=priorvals["mean"], cov=priorvals["cov"])
         return prior
 
@@ -916,7 +918,7 @@ class SpectralModel(fitter.SimpleFitter):
 
         return sampler
 
-    def get_emcee_ensemblesampler(self, xarr, data, error, nwalkers, priorvals, **kwargs):
+    def get_emcee_ensemblesampler(self, xarr, data, error, nwalkers, priorvals, savename=None, **kwargs):
         """
         Get an emcee walker ensemble for the data & model
 
@@ -950,9 +952,10 @@ class SpectralModel(fitter.SimpleFitter):
         
         def probfunc(pars):
             return self.logp(xarr, data, error, pars=pars) + np.log(self.priorfn(priorvals, pars=pars))
-        
-        filename='./Results/mcmcresults.h5'
-        backend= emcee.backends.HDFBackend(filename)
+
+        if savename is None:
+            savename='mcmcresults.h5'
+        backend= emcee.backends.HDFBackend(savename)
         backend.reset(nwalkers, self.npars*self.npeaks+self.vheight)
         sampler = emcee.EnsembleSampler(nwalkers,
                                         self.npars*self.npeaks+self.vheight,
