@@ -1969,6 +1969,7 @@ class Specfit(interactive.Interactive):
                 nwalkers = (self.fitter.npars * self.fitter.npeaks + self.fitter.vheight) * 2
 
             emc =spectral_Mod.get_emcee_ensemblesampler(self.fitter, self.Spectrum.xarr,
+
                                                         self.spectofit,
                                                         self.errspec, nwalkers, priorvals)
             #emc = self.fitter.get_emcee_ensemblesampler(self.Spectrum.xarr,
