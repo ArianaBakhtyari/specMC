@@ -7,8 +7,7 @@
        _make sure you have atleast python version 3.6 installed_
         3. python setup.py install
 
-## Example to run:
-### General Instructions
+## General Instructions
 There are two ways to run the code 
         - Using the built in prompts
         - Using the command line
@@ -28,31 +27,39 @@ The following is a description of each variable:
 - number of walkers- Number of walkers for mcmc
 - number of steps- Number of steps you'd like each walker to take
 - number of steps to reject (Burn)- Number of steps you'd like to reject when analayzing the data (The initial steps are always noisy and inaccurate)
+
+## Example to run:
 ###     1. Using the built in prompts:
                 Run a one-component fixfortho fit (one dataset):
 _python runScript.py {firstDataFile} {fittype} {guesses}_
+
 `                python runScript.py ../notebook/data/nh3_11_cubeA.fits fixfortho 20,10,20,0.11,8`
 
                 Run a two-component fixfortho fit (two datasets):
 _python runScript.py {firstDataFile} {fittype} {guesses x2} {secondDataFile}_
+ 
 `                python runScript.py ../notebook/data/nh3_11_cubeA.fits fixfortho 20,10,20,0.11,8,20,10,20,0.11,8 ../notebook/data/nh3_22_cubeA.fits`
 
                 Run a one-component fixfortho fit (two datasets):
 _python runScript.py {firstDataFile} {fittype} {guesses} {secondDataFile}_
+ 
 `                python runScript.py ../notebook/data/nh3_11_cubeA.fits fixfortho 20,10,20,0.11,8 ../notebook/data/nh3_22_cubeA.fits`
 
 ###     2. Using the command line
         Run a one-component fixfortho fit (one dataset):
 _python runScript.py {firstDataFile} {fittype} {guesses} {p0} {standard deviation of p0} {prior} {error of prior} {y or n for Fitting the model} {x0} {y0} {number of walkers} {number of steps} {number of steps to reject}_
+
 `        python runScript.py ../notebook/data/nh3_11_cubeA.fits fixfortho 20,10,20,0.11,8 10,5.3,25,0.13,8.16 3,1,2,0.026,0.051 10,7,14,0.15,8.2 2,2,3,1,0.5 y 68 125 2000 5000 2500`
 
         Run a two-component fixfortho fit (two datasets):
 
 _python runScript.py {firstDataFile} {fittype} {guesses} {secondDataFile} {p0 x2} {standard deviation of p0 x2} {prior x2} {error of prior x2} {y or n for Fitting the model} {x0} {y0} {number of walkers} {number of steps} {number of steps to reject}_
+
 `                python runScript.py ../notebook/data/nh3_11_cubeA.fits fixfortho 20,10,20,0.11,8,20,10,20,0.11,8 ../notebook/data/nh3_22_cubeA.fits 10,5.3,25,0.13,8.16,10,5.3,25,0.13,8.16 3,1,2,0.026,0.051,3,1,2,0.026,0.051 10,7,14,0.15,8.2,10,7,14,0.15,8.2 2,2,3,1,0.5,2,2,3,1,0.5 y 68 125 2000 5000 2500 `
 
         Run a one-component fixfortho fit (two datasets):
 _python runScript.py {firstDataFile} {fittype} {guesses} {secondDataFile} {p0} {standard deviation of p0} {prior} {error of prior} {y or n for Fitting the model} {x0} {y0} {number of walkers} {number of steps} {number of steps to reject}_
+
 `        python runScript.py ../notebook/data/nh3_11_cubeA.fits fixfortho 20,10,20,0.11,8 ../notebook/data/nh3_22_cubeA.fits 10,5.3,25,0.13,8.16 3,1,2,0.026,0.051 10,7,14,0.15,8.2 2,2,3,1,0.5 y 68 125 2000 5000 2500`
 
 ## Description of Files: 
