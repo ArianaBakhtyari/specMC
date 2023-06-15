@@ -10,8 +10,8 @@ from spectral_cube import SpectralCube
 import matplotlib.pyplot as plt
 import emcee
 import numpy as np
-from models import ammonia, ammonia_fixfortho
-from fitters_withPrior import Specfit 
+from .models import ammonia, ammonia_fixfortho
+from .fitters_withPrior import Specfit
 
 
 class SpecModel:
