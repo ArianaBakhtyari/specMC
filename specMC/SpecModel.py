@@ -344,7 +344,12 @@ class SpecModel:
         self.nbins=self.ndim * 2
         self.nwalkers=self.Walkers
         self.nsteps=self.steps
-        self.emcee_ensemble= Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior, self.nwalkers)
+        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers)
+
+        #HARD CODED EXAMPLE: 
+        #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
+        #self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nbins) #commented out by mchen
+
         self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nwalkers)
         print(self.p0.shape)
         print("Running emcee")
