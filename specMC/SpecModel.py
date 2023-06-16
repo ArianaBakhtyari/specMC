@@ -42,6 +42,16 @@ class SpecModel:
             self.cube1, self.cube1a =self.createCube(inFiles[0])
             self.cube2, self.cube2a =self.createCube(inFiles[1])
             self.model=2
+
+            # create a Cube Stack
+            cubes = []
+            for c in [self.cube1a, self.cube2a]:
+                pcube = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
+                pcube.xarr.velocity_convention = 'radio'
+                pcube.xarr.convert_to_unit("km/s")
+                cubes.append(pcube)
+
+            self.cubes = pyspeckit.CubeStack(cubes)
         
     def getSampleBall(self):
         """
@@ -248,15 +258,8 @@ class SpecModel:
         print(pcubea)
         return cubea
 
-    def get_sp(self, x, y, guesses):
-        # need a way to
-        pcube1a = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
-        pcube1a.xarr.velocity_convention = 'radio'
-        pcube1a.xarr.convert_to_unit("km/s")
-        pcube2a = pyspeckit.Cube(cube=self.cube2a)  # , xO=self.x0, yO=self.y0)
-        pcube2a.xarr.velocity_convention = 'radio'
-        pcube2a.xarr.convert_to_unit("km/s")
-        cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
+    def get_Spectrum(self, x, y, guesses):
+        # get a pyspeckit Spectrum at the x,y location, accompanied by an in-house Specfit object
 
         if self.fittype == 'fixfortho':
             print(self.fittype)
@@ -265,16 +268,17 @@ class SpecModel:
             print(self.fittype)
             fitter = ammonia.nh3_multi_v_model_generator(n_comp=self.ncomp)
 
-        self.sp = cubes
-        self.sp.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+        self.cubes.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+        self.sp = self.cubes.get_spectrum(x, y)
 
-        # AttributeError: The 'specfit' object has no 'fitter' yet.  This means you haven't yet run a fit.
-        # The fitter is not accessible until after a fit has been run.
-        self.sp = self.sp.get_spectrum(x, y)
-
-        #  replace the  pyspeckit Specfit object with the one fromt his package
+        #  replace the pyspeckit Specfit object with the one from his package
         self.sp.specfit = Specfit(self.sp, self.sp.Registry)
         self.sp.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+
+        # fit the spectrum using pyspeckit. Note: a method is needed to access the fitter without running the fit
+        # below is the error message generated when trying to access a fitter object without fitting the spectrum first
+        # >>> AttributeError: The 'specfit' object has no 'fitter' yet.  This means you haven't yet run a fit.
+        # >>> The fitter is not accessible until after a fit has been run.
         self.sp.specfit(fittype=self.fittype, guesses=guesses)
 
 
@@ -336,7 +340,7 @@ class SpecModel:
             cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
             self.sp=cubes
 
-    def runEmcee(self, array):
+    def runEmcee(self, array, progress=True):
         """
         This function runs emcee for the respective spectrum with the respective prior
         """
@@ -344,11 +348,30 @@ class SpecModel:
         self.nbins=self.ndim * 2
         self.nwalkers=self.Walkers
         self.nsteps=self.steps
-        self.emcee_ensemble= Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior, self.nwalkers)
+        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers)
+
+        #HARD CODED EXAMPLE: 
+        #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
+        #self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nbins) #commented out by mchen
+
         self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nwalkers)
         print(self.p0.shape)
         print("Running emcee")
-        self.emcee_ensemble.run_mcmc(self.p0, self.nsteps)
+        self.emcee_ensemble.run_mcmc(self.p0, self.nsteps, progress=progress)
+
+    def runEmcee_continue(self, nsteps, progress=True):
+        '''
+        Continue emcee sampling from where the last run left off
+        Parameters
+        ----------
+        nsteps <int>
+            the number of additional steps to run with the current emcee sampler
+        '''
+        print("Initial steps: {0}".format(self.emcee_ensemble.backend.iteration))
+        self.emcee_ensemble.run_mcmc(None, nsteps, progress=progress)
+        print("Final steps: {0}".format(self.emcee_ensemble.backend.iteration))
+        # update nsteps
+        self.nsteps = self.emcee_ensemble.backend.iteration
 
     def proto_gauss_prior(self):
         """
@@ -383,4 +406,25 @@ class SpecModel:
         self.burned_chain = self.emcee_ensemble.chain[:,:stb,:] 
         self.burned_flatchain = np.reshape(self.burned_chain,(-1,self.ndim))
         self.burned_lnpost = self.emcee_ensemble.lnprobability[:,:stb] 
-        
+
+    #================================================================================================#
+    # wrapper functions
+    def setup_run(self, x, y, guesses, p0, std, prior, error, n_walkers, steps, burnin, fit=True):
+        self.sampleball = []
+        self.prior = []
+
+        self.findComponents(guesses)
+
+        self.sampleball.append(p0)  # p0
+        self.sampleball.append(std)  # std
+        self.prior.append(prior)  # prior
+        self.prior.append(error)  # error
+        self.Fit = fit  # fit
+        self.x0 = int(x)
+        self.y0 = int(y)
+        self.Walkers = int(n_walkers)  # walkers
+        self.steps = int(steps)  # steps
+        self.Burn = int(burnin)  # burnin
+
+        # get the spectrum at the pixel and perform an initial fit
+        self.get_Spectrum(x, y, guesses)
