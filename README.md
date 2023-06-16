@@ -1,6 +1,7 @@
 # Bayesian Inference using MCMC for ammonia spectral model
 Authors: Ariana Bakhtyari and Mike Chen
-emails: ariana.bakhtyari@queensu.ca and chen.m@queensu.ca
+
+Emails: ariana.bakhtyari@queensu.ca and chen.m@queensu.ca
 ## How to setup by Cloning this Repo:
 
         1. git clone {github address} 
