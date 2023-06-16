@@ -406,4 +406,25 @@ class SpecModel:
         self.burned_chain = self.emcee_ensemble.chain[:,:stb,:] 
         self.burned_flatchain = np.reshape(self.burned_chain,(-1,self.ndim))
         self.burned_lnpost = self.emcee_ensemble.lnprobability[:,:stb] 
-        
+
+    #================================================================================================#
+    # wrapper functions
+    def setup_run(self, x, y, guesses, p0, std, prior, error, n_walkers, steps, burnin, fit=True):
+        self.sampleball = []
+        self.prior = []
+
+        self.findComponents(guesses)
+
+        self.sampleball.append(p0)  # p0
+        self.sampleball.append(std)  # std
+        self.prior.append(prior)  # prior
+        self.prior.append(error)  # error
+        self.Fit = fit  # fit
+        self.x0 = int(x)
+        self.y0 = int(y)
+        self.Walkers = int(n_walkers)  # walkers
+        self.steps = int(steps)  # steps
+        self.Burn = int(burnin)  # burnin
+
+        # get the spectrum at the pixel and perform an initial fit
+        self.get_Spectrum(x, y, guesses)
