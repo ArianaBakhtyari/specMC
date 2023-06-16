@@ -42,6 +42,16 @@ class SpecModel:
             self.cube1, self.cube1a =self.createCube(inFiles[0])
             self.cube2, self.cube2a =self.createCube(inFiles[1])
             self.model=2
+
+            # create a Cube Stack
+            cubes = []
+            for c in [self.cube1a, self.cube2a]:
+                pcube = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
+                pcube.xarr.velocity_convention = 'radio'
+                pcube.xarr.convert_to_unit("km/s")
+                cubes.append(pcube)
+
+            self.cubes = pyspeckit.CubeStack(cubes)
         
     def getSampleBall(self):
         """
@@ -248,15 +258,8 @@ class SpecModel:
         print(pcubea)
         return cubea
 
-    def get_sp(self, x, y, guesses):
-        # need a way to
-        pcube1a = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
-        pcube1a.xarr.velocity_convention = 'radio'
-        pcube1a.xarr.convert_to_unit("km/s")
-        pcube2a = pyspeckit.Cube(cube=self.cube2a)  # , xO=self.x0, yO=self.y0)
-        pcube2a.xarr.velocity_convention = 'radio'
-        pcube2a.xarr.convert_to_unit("km/s")
-        cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
+    def get_Spectrum(self, x, y, guesses):
+        # get a pyspeckit Spectrum at the x,y location, accompanied by an in-house Specfit object
 
         if self.fittype == 'fixfortho':
             print(self.fittype)
@@ -265,16 +268,17 @@ class SpecModel:
             print(self.fittype)
             fitter = ammonia.nh3_multi_v_model_generator(n_comp=self.ncomp)
 
-        self.sp = cubes
-        self.sp.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+        self.cubes.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+        self.sp = self.cubes.get_spectrum(x, y)
 
-        # AttributeError: The 'specfit' object has no 'fitter' yet.  This means you haven't yet run a fit.
-        # The fitter is not accessible until after a fit has been run.
-        self.sp = self.sp.get_spectrum(x, y)
-
-        #  replace the  pyspeckit Specfit object with the one fromt his package
+        #  replace the pyspeckit Specfit object with the one from his package
         self.sp.specfit = Specfit(self.sp, self.sp.Registry)
         self.sp.specfit.register_fitter(self.fittype, fitter, fitter.npars)
+
+        # fit the spectrum using pyspeckit. Note: a method is needed to access the fitter without running the fit
+        # below is the error message generated when trying to access a fitter object without fitting the spectrum first
+        # >>> AttributeError: The 'specfit' object has no 'fitter' yet.  This means you haven't yet run a fit.
+        # >>> The fitter is not accessible until after a fit has been run.
         self.sp.specfit(fittype=self.fittype, guesses=guesses)
 
 
