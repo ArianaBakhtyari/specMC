@@ -355,6 +355,20 @@ class SpecModel:
         print("Running emcee")
         self.emcee_ensemble.run_mcmc(self.p0, self.nsteps)
 
+    def runEmcee_continue(self, nsteps, progress=True):
+        '''
+        Continue emcee sampling from where the last run left off
+        Parameters
+        ----------
+        nsteps <int>
+            the number of additional steps to run with the current emcee sampler
+        '''
+        print("Initial steps: {0}".format(self.emcee_ensemble.backend.iteration))
+        self.emcee_ensemble.run_mcmc(None, nsteps, progress=progress)
+        print("Final steps: {0}".format(self.emcee_ensemble.backend.iteration))
+        # update nsteps
+        self.nsteps = self.emcee_ensemble.backend.iteration
+
     def proto_gauss_prior(self):
         """
         This function sets up the respective mean and calculates the respective prior to be used in fitters_withPrior.py and model_withPrior.py
