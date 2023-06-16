@@ -336,7 +336,7 @@ class SpecModel:
             cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
             self.sp=cubes
 
-    def runEmcee(self, array):
+    def runEmcee(self, array, progress=True):
         """
         This function runs emcee for the respective spectrum with the respective prior
         """
@@ -353,7 +353,7 @@ class SpecModel:
         self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nwalkers)
         print(self.p0.shape)
         print("Running emcee")
-        self.emcee_ensemble.run_mcmc(self.p0, self.nsteps)
+        self.emcee_ensemble.run_mcmc(self.p0, self.nsteps, progress=progress)
 
     def runEmcee_continue(self, nsteps, progress=True):
         '''
