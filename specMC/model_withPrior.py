@@ -876,7 +876,6 @@ class SpectralModel(fitter.SimpleFitter):
         Paramaters
         
         ---------
-
         priorvals: dictionary consisting of steps (int) , mean (float), and covariance (float) of the prior
         """
         prior=scipy.stats.multivariate_normal.pdf(pars , mean=priorvals["mean"], cov=priorvals["cov"])

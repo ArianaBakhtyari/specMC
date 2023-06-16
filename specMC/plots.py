@@ -1,6 +1,13 @@
 
 """
-This file creates all necessary plots to further aanalyze the data
+This file creates all necessary plots to further analyze the data
+
+The following plots can be create
+    - corner plot- showing the one and two dimesnional projections of each component required for the fit
+    - historgram for each component required to fit the model- a type of bar plot that groups the data into bins
+    - subplots for each component required to fit the model- plotting each value of each required component
+
+With each plot you have the ability to create a Burn-in version where you can reject a certain amount of steps defined by the user. The functions are plotBurnCorner() and plotBurnSubplots().
 """
 import corner
 import numpy as np
@@ -8,17 +15,16 @@ import matplotlib.pyplot as plt
 
 def plotCorner(emcee_ensemble, nameOfFile, titles, savename=None):
     """ 
-    This function plots the original
+    This function plots the original corner plot
 
     Parameters
-
     -----------
     emcee_ensemble:
-        most recent results from mcmc on the sample
+        results of mcmc on the sample provided by the user
     nameOfFile: string
         desired name of plot
     titles: array
-        array of strings of components for the desired fit
+        array of strings of components required for the desired fit
     """
     #corner.corner(emcee_ensemble.flatchain);
     plt.figure(corner.corner(emcee_ensemble.flatchain, labels = titles))
@@ -28,7 +34,7 @@ def plotCorner(emcee_ensemble, nameOfFile, titles, savename=None):
 
 def plotBurnCorner(flatchain, nameOfFile, titles, savename=None):
     """
-    This function plots the corner plots with the corresponding burn-in values
+    This function plots the corner plots with the corresponding burn-in values. 
 
     Parameters
 
@@ -37,7 +43,7 @@ def plotBurnCorner(flatchain, nameOfFile, titles, savename=None):
     nameOfFile: string
         desired name of plot
     titles: array
-        array of strings of components for the desired fit
+        array of strings of components required for the desired fit
     """
     #corner.corner(flatchain);
 
@@ -50,17 +56,17 @@ def plotBurnCorner(flatchain, nameOfFile, titles, savename=None):
 def plotMSP(emcee_ensemble,titles, nbins, savename=None):
 
         """
-        This function plots the Median and Standard deviation histograms for each component
+        This function plots the Median and Standard deviation histograms for each component required for the desired fit
 
         Parameters
 
         -----------
         emcee_ensemble:
-            most recent results from mcmc on the sample
+            results of mcmc on the sample provided by the user
         titles: array
-            array of strings of components for the desired fit
+            array of strings of components required for the desired fit
         nbins: int
-            number of bins 
+            number of bins
         """
 
         values=[]
@@ -93,7 +99,7 @@ def plotSubplots(emcee_ensemble, titles, nameOfFile, savename=None):
 
         -----------
         emcee_ensemble:
-            most recent results from mcmc on the sample
+            results of mcmc on the sample provided by the user
         titles: array
             array of strings of components for the desired fit
         nameOfFile: string
@@ -127,7 +133,7 @@ def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOf
 
         -----------
         emcee_ensemble:
-            most recent results from mcmc on the sample
+            results of mcmc on the sample provided by the user
         steps_to_burn: int
             number of steps to reject
         burn_setting: string

@@ -304,7 +304,7 @@ class SpecModel:
         print(pcubea)
         return cubea
 
-    def get_sp(self, x, y, guesses):
+    def get_Spectrum(self, x, y, guesses):
         """
         This function creates the SpectralModel Object for the spectrum to be analyzed
 
@@ -317,15 +317,7 @@ class SpecModel:
         guesses: np.ndarray
             Initial guesses for your fit
         """
-        # need a way to
-        pcube1a = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
-        pcube1a.xarr.velocity_convention = 'radio'
-        pcube1a.xarr.convert_to_unit("km/s")
-        pcube2a = pyspeckit.Cube(cube=self.cube2a)  # , xO=self.x0, yO=self.y0)
-        pcube2a.xarr.velocity_convention = 'radio'
-        pcube2a.xarr.convert_to_unit("km/s")
-        cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
-
+       
         if self.fittype == 'fixfortho':
             print(self.fittype)
             fitter = ammonia_fixfortho.nh3_fixfortho_model(n_comp=self.ncomp)
