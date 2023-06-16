@@ -9,6 +9,16 @@ import matplotlib.pyplot as plt
 def plotCorner(emcee_ensemble, nameOfFile, titles):
     """ 
     This function plots the original
+
+    Parameters
+
+    -----------
+    emcee_ensemble:
+        most recent results from mcmc on the sample
+    nameOfFile: string
+        desired name of plot
+    titles: array
+        array of strings of components for the desired fit
     """
     corner.corner(emcee_ensemble.flatchain);
     plt.figure(corner.corner(emcee_ensemble.flatchain, labels = titles))
@@ -17,6 +27,15 @@ def plotCorner(emcee_ensemble, nameOfFile, titles):
 def plotBurnCorner(flatchain, nameOfFile, titles):
     """
     This function plots the corner plots with the corresponding burn-in values
+
+    Parameters
+
+    -----------
+    flatchain: np.ndarray
+    nameOfFile: string
+        desired name of plot
+    titles: array
+        array of strings of components for the desired fit
     """
     corner.corner(flatchain);
     plt.figure(corner.corner(flatchain, labels = titles))
@@ -25,6 +44,16 @@ def plotBurnCorner(flatchain, nameOfFile, titles):
 def plotMSP(emcee_ensemble,titles, nbins):
         """
         This function plots the Median and Standard deviation histograms for each component
+
+        Parameters
+
+        -----------
+        emcee_ensemble:
+            most recent results from mcmc on the sample
+        titles: array
+            array of strings of components for the desired fit
+        nbins: int
+            number of bins 
         """
         values=[]
         medVals=[]
@@ -48,6 +77,16 @@ def plotMSP(emcee_ensemble,titles, nbins):
 def plotSubplots(emcee_ensemble, titles, nameOfFile):
         """
         This function plots each components value with respect to each step
+
+        Parameters
+
+        -----------
+        emcee_ensemble:
+            most recent results from mcmc on the sample
+        titles: array
+            array of strings of components for the desired fit
+        nameOfFile: string
+            desired name of plot
         """
         walker_to_inspect=0 # index of walker
         median_lnpost = np.median(emcee_ensemble.lnprobability[walker_to_inspect,:])
@@ -70,6 +109,20 @@ def plotSubplots(emcee_ensemble, titles, nameOfFile):
 def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOfFile):
         """
         This function plots each components value with respect to the remaining steps after rejecting a certain number of steps
+
+        Parameters
+
+        -----------
+        emcee_ensemble:
+            most recent results from mcmc on the sample
+        steps_to_burn: int
+            number of steps to reject
+        burn_setting: string
+                choice of "before", first # of steps, or "after", last # of steps, to be rejected
+        titles: array
+            array of strings of components for the desired fit
+        nameOfFile: string
+            desired name of plot
         """
         stb = steps_to_burn
         walker_to_inspect=0 # index of walker

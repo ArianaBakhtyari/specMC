@@ -18,6 +18,14 @@ class SpecModel:
     def __init__(self, inFiles, fittype):
         """
         This function initializes the SpecModel object
+
+        Parameters
+
+        -----------
+        inFiles: string (path of file)
+            desired datafile to be analyzed
+        fittype: string
+            desired fit type
         """
         self.fittype= fittype
         if fittype=='gaussian':
@@ -83,6 +91,13 @@ class SpecModel:
     def findComponents(self,guesses):
         """
         This function calculates the respective components and assigns the proper amount of titles for the number of components
+
+        Parameters
+
+        -----------
+        guesses: np.ndarray
+            Initial guesses for your fit
+
         """
         self.ncomp=int(len(guesses)/len(self.titles))
         i=0
@@ -135,6 +150,11 @@ class SpecModel:
     def promptUser(self, arguments):
         """
         This function prompts the user based on if the user wants to use the command line or if they choose to be prompted
+
+        Parameters
+        ------------
+        arguments: sys.argv
+            system arguments
         """
         if len(arguments) <= 5:
             self.getSampleBall()
@@ -162,6 +182,11 @@ class SpecModel:
     def toAnArrayOfInt(self, inputString):
         """
         This function returns an array when inputted a string
+        
+        Parameters
+        ----------
+        inputString: string
+            desired string to be converted into an array
         """
         array=inputString.split(',')
         newarray = [float(n) for n in array]
@@ -232,6 +257,11 @@ class SpecModel:
     def createCube(self, inFile):
         """
         This function creates a cube to be analyzed
+
+        Parameters
+        -----------
+        inFiles: string (path of file)
+            desired datafile to be analyzed
         """
         fn1=fits.open(inFile)
         cube1 = SpectralCube.read(fn1)
@@ -241,6 +271,10 @@ class SpecModel:
     def convertUnits(self, cubea):
         """
         This function ensures the units are in the proper units
+
+        Parameters
+        ----------
+        cubea: spectralcube object
         """
         pcubea = pyspeckit.Cube(cube=cubea)
         pcubea.xarr.velocity_convention='radio'
@@ -249,6 +283,18 @@ class SpecModel:
         return cubea
 
     def get_sp(self, x, y, guesses):
+        """
+        This function creates the SpectralModel Object for the spectrum to be analyzed
+
+        Parameters
+        -----------
+        x: int
+            x coordinate of pixel to be analyzed
+        y: int
+            y coordinate of pixel to be analyzed
+        guesses: np.ndarray
+            Initial guesses for your fit
+        """
         # need a way to
         pcube1a = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
         pcube1a.xarr.velocity_convention = 'radio'
@@ -281,6 +327,13 @@ class SpecModel:
     def fit(self, fittype, guesses):
         """
         This function fits the model and creates the spectrum analyzed
+
+        Parameters
+        -----------
+        fittype: string
+            desired fit type
+        guesses: np.ndarray
+            Initial guesses for your fit
         """
         self.guesses = guesses
         if self.model ==1:
@@ -318,6 +371,11 @@ class SpecModel:
     def noFit(self,guesses):
         """
         This function runs if the user does not want to Fit their model (Note: this function breaks. Fit must always be True)
+
+        Parameters
+        ----------
+        guesses: np.ndarray
+            Initial guesses for your fit
         """
         self.guesses = guesses
         if self.model==1:
@@ -339,6 +397,11 @@ class SpecModel:
     def runEmcee(self, array):
         """
         This function runs emcee for the respective spectrum with the respective prior
+
+        Parameters
+        ------------
+        array: list (float)
+            Initial guesses for your fit
         """
         self.ndim= len(array)
         self.nbins=self.ndim * 2
@@ -369,6 +432,11 @@ class SpecModel:
     def rejectFirst(self,steps_to_burn):
         """
         This function removes the first respective number of steps identified
+        
+        Parameters
+        -----------
+        steps_to_burn: int
+            number of steps to reject
         """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,stb:,:] 
@@ -378,6 +446,11 @@ class SpecModel:
     def rejectLast(self,steps_to_burn):
         """
         This function removes the last respective number of steps identified
+
+        Parameters
+        -----------
+        steps_to_burn: int
+            number of steps to reject
         """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,:stb,:] 
