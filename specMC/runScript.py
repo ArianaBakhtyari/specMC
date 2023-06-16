@@ -5,6 +5,9 @@ from os.path import exists
 from plots import *
 
 class Run():
+    """
+    This class runs specMC
+    """
     print("Starting")
     print("creating model")
     try:

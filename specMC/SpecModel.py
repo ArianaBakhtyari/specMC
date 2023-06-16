@@ -1,8 +1,5 @@
-#This manipulates the data in runScript.py
-import os
 import sys
 from typing import Any
-#sys.path.append(f"{os.getenv('STEM')}/pyspeckit-IncorporatePrior")
 import pyspeckit
 from astropy import units as u
 from astropy.io import fits
@@ -15,8 +12,13 @@ from .fitters_withPrior import Specfit
 
 
 class SpecModel:
-    
+    """
+    This class creates the specModel object
+    """
     def __init__(self, inFiles, fittype):
+        """
+        This function initializes the SpecModel object
+        """
         self.fittype= fittype
         if fittype=='gaussian':
             self.titles=['Amplitude', 'Shift', 'Width']
@@ -42,6 +44,9 @@ class SpecModel:
             self.model=2
         
     def getSampleBall(self):
+        """
+        This function prompts the user for the initial points for the walker and its standard deviation
+        """
         sampleball=[]
         p0=[]
         std=[]
@@ -67,12 +72,18 @@ class SpecModel:
         self.sampleball=sampleball
     
     def askForFit(self):
+        """ 
+        This function asks if the user would like their function to be fit (Note: No fitting does not work)
+        """
         Fit=None
         while Fit not in ("y","n"):
             Fit =input ("Would you like to fit your model? (y/n)")
         self.Fit=Fit
 
     def findComponents(self,guesses):
+        """
+        This function calculates the respective components and assigns the proper amount of titles for the number of components
+        """
         self.ncomp=int(len(guesses)/len(self.titles))
         i=0
         actualTitles=[]
@@ -94,6 +105,9 @@ class SpecModel:
                 component=component +1
             
     def askForPrior(self):
+        """
+        This function prompts the user for the prior values and their respective error
+        """
         thePrior=[]
         prior=[]
         error=[]
@@ -119,6 +133,9 @@ class SpecModel:
         self.prior=thePrior
 
     def promptUser(self, arguments):
+        """
+        This function prompts the user based on if the user wants to use the command line or if they choose to be prompted
+        """
         if len(arguments) <= 5:
             self.getSampleBall()
             self.askForPrior()
@@ -143,11 +160,17 @@ class SpecModel:
             self.Burn=int(sys.argv[len(arguments)-1]) #burnin
 
     def toAnArrayOfInt(self, inputString):
+        """
+        This function returns an array when inputted a string
+        """
         array=inputString.split(',')
         newarray = [float(n) for n in array]
         return newarray
     
     def askForPixel(self):
+        """
+        This function prompts the user for the desired pixel to be analyzed
+        """
         while True:
             try:
                 x0=int(input("Please enter the x0 value "))
@@ -166,6 +189,9 @@ class SpecModel:
         self.y0=y0
 
     def askForBurnIn(self):
+        """
+        This function prompts the user asking if they'd like to select their own Burn-In value
+        """
         Burn = "m"
         while Burn not in ("y","n"):
             Burn =input ("Would you like to select how many points to Burn-In? (y/n)")
@@ -183,6 +209,9 @@ class SpecModel:
         self.Burn=burnIn
         
     def askForWalkers(self):
+        """
+        This function prompts the user for the number of walkers they'd like to use
+        """
         while True:
             try:
                 walkers=int(input("How many walkers would you like: "))
@@ -201,12 +230,18 @@ class SpecModel:
         self.steps=steps
                 
     def createCube(self, inFile):
+        """
+        This function creates a cube to be analyzed
+        """
         fn1=fits.open(inFile)
         cube1 = SpectralCube.read(fn1)
         cube1a = cube1.with_spectral_unit(u.Hz)
         return (cube1, cube1a)
 
     def convertUnits(self, cubea):
+        """
+        This function ensures the units are in the proper units
+        """
         pcubea = pyspeckit.Cube(cube=cubea)
         pcubea.xarr.velocity_convention='radio'
         pcubea.xarr.convert_to_unit("km/s")
@@ -244,6 +279,9 @@ class SpecModel:
 
 
     def fit(self, fittype, guesses):
+        """
+        This function fits the model and creates the spectrum analyzed
+        """
         self.guesses = guesses
         if self.model ==1:
             pcube1 = pyspeckit.Cube(cube=self.cube1a, xO=self.x0, yO=self.y0)
@@ -277,8 +315,10 @@ class SpecModel:
             cubes.specfit.plot_fit()
         plt.savefig(f'./Results/{fittype}plot.png')
 
-#this function breaks. Fit must always be True
     def noFit(self,guesses):
+        """
+        This function runs if the user does not want to Fit their model (Note: this function breaks. Fit must always be True)
+        """
         self.guesses = guesses
         if self.model==1:
             pcube1 = pyspeckit.Cube(cube=self.cube1a, x0= self.x0, y0=self.y0)
@@ -297,6 +337,9 @@ class SpecModel:
             self.sp=cubes
 
     def runEmcee(self, array):
+        """
+        This function runs emcee for the respective spectrum with the respective prior
+        """
         self.ndim= len(array)
         self.nbins=self.ndim * 2
         self.nwalkers=self.Walkers
@@ -306,12 +349,16 @@ class SpecModel:
         #HARD CODED EXAMPLE: 
         #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
         #self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nbins) #commented out by mchen
+
         self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nwalkers)
         print(self.p0.shape)
         print("Running emcee")
         self.emcee_ensemble.run_mcmc(self.p0, self.nsteps)
 
     def proto_gauss_prior(self):
+        """
+        This function sets up the respective mean and calculates the respective prior to be used in fitters_withPrior.py and model_withPrior.py
+        """
         self.priorvals={}
         self.priorvals["mean"]=[]
         self.priorvals["cov"]=[]
@@ -325,12 +372,18 @@ class SpecModel:
         return self.priorvals
 
     def rejectFirst(self,steps_to_burn):
+        """
+        This function removes the first respective number of steps identified
+        """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,stb:,:] 
         self.burned_flatchain = np.reshape(self.burned_chain,(-1,self.ndim)) 
         self.burned_lnpost = self.emcee_ensemble.lnprobability[:,stb:] 
 
     def rejectLast(self,steps_to_burn):
+        """
+        This function removes the last respective number of steps identified
+        """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,:stb,:] 
         self.burned_flatchain = np.reshape(self.burned_chain,(-1,self.ndim))
