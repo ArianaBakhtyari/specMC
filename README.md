@@ -1,5 +1,6 @@
 # Bayesian Inference using MCMC for ammonia spectral model
-
+Authors: Ariana Bakhtyari and Mike Chen
+emails: ariana.bakhtyari@queensu.ca and chen.m@queensu.ca
 ## How to setup by Cloning this Repo:
 
         1. git clone {github address} 
@@ -8,9 +9,11 @@
         3. python setup.py install
 
 ## General Instructions
-There are two ways to run the code 
-        - Using the built in prompts
-        - Using the command line
+There are two ways to run the code:
+
+- Using the built in prompts
+- Using the command line
+
 When running the script you must run _python runScript.py {firstDataFile} {fittype} {guesses}_ for the most general fit. If you'd like to compare two Datasets then you have the option of adding the _{secondDataFile}_. You also have the choice between a one-component and a two-component fit. When using two-components you must enter double the guesses, p0,  standard deciation, prior, error required for the fit. 
 
 The following is a description of each variable:
