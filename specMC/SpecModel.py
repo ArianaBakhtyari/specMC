@@ -18,6 +18,14 @@ class SpecModel:
     def __init__(self, inFiles, fittype):
         """
         This function initializes the SpecModel object
+
+        Parameters
+
+        -----------
+        inFiles: string (path of file)
+            desired datafile(s) to be analyzed
+        fittype: string
+            desired fit type to be performed on dataset
         """
         self.fittype= fittype
         if fittype=='gaussian':
@@ -93,6 +101,13 @@ class SpecModel:
     def findComponents(self,guesses):
         """
         This function calculates the respective components and assigns the proper amount of titles for the number of components
+
+        Parameters
+
+        -----------
+        guesses: np.ndarray
+            Initial guesses for the fit passed in by the user
+
         """
         self.ncomp=int(len(guesses)/len(self.titles))
         i=0
@@ -145,6 +160,23 @@ class SpecModel:
     def promptUser(self, arguments):
         """
         This function prompts the user based on if the user wants to use the command line or if they choose to be prompted
+
+        Parameters
+        ------------
+        arguments: sys.argv
+            system arguments consisting of a combination of the following:
+                - fittype- The fittype you'd like for your model
+                - guesses- Initial guesses for your fit
+                - p0- Starting points for your walkers
+                - standard deviation of p0- std for your walkers
+                - prior- The prior for each component
+                - error of prior- The error for each component
+                - y or n for Fitting the model- If you'd like to fit the model
+                - x0- The x coordinate of the pixel you'd like to analyze
+                - y0- The y coordinate of the pixel you'd like to analyze
+                - number of walkers- Number of walkers for mcmc
+                - number of steps- Number of steps you'd like each walker to take
+                - number of steps to reject (Burn)- Number of steps you'd like to reject when analayzing the data (The initial steps are always noisy and inaccurate)
         """
         if len(arguments) <= 5:
             self.getSampleBall()
@@ -172,6 +204,11 @@ class SpecModel:
     def toAnArrayOfInt(self, inputString):
         """
         This function returns an array when inputted a string
+        
+        Parameters
+        ----------
+        inputString: string
+            desired string to be converted into an array
         """
         array=inputString.split(',')
         newarray = [float(n) for n in array]
@@ -242,6 +279,11 @@ class SpecModel:
     def createCube(self, inFile):
         """
         This function creates a cube to be analyzed
+
+        Parameters
+        -----------
+        inFiles: string (path of file)
+            desired datafile to be analyzed
         """
         fn1=fits.open(inFile)
         cube1 = SpectralCube.read(fn1)
@@ -251,6 +293,10 @@ class SpecModel:
     def convertUnits(self, cubea):
         """
         This function ensures the units are in the proper units
+
+        Parameters
+        ----------
+        cubea: spectralcube object created
         """
         pcubea = pyspeckit.Cube(cube=cubea)
         pcubea.xarr.velocity_convention='radio'
@@ -259,8 +305,19 @@ class SpecModel:
         return cubea
 
     def get_Spectrum(self, x, y, guesses):
-        # get a pyspeckit Spectrum at the x,y location, accompanied by an in-house Specfit object
+        """
+        This function creates the SpectralModel Object for the spectrum to be analyzed
 
+        Parameters
+        -----------
+        x: int
+            x coordinate of pixel to be analyzed
+        y: int
+            y coordinate of pixel to be analyzed
+        guesses: np.ndarray
+            Initial guesses for your fit
+        """
+       
         if self.fittype == 'fixfortho':
             print(self.fittype)
             fitter = ammonia_fixfortho.nh3_fixfortho_model(n_comp=self.ncomp)
@@ -285,6 +342,13 @@ class SpecModel:
     def fit(self, fittype, guesses):
         """
         This function fits the model and creates the spectrum analyzed
+
+        Parameters
+        -----------
+        fittype: string
+            desired fit type
+        guesses: np.ndarray
+            Initial guesses for your fit
         """
         self.guesses = guesses
         if self.model ==1:
@@ -322,6 +386,11 @@ class SpecModel:
     def noFit(self,guesses):
         """
         This function runs if the user does not want to Fit their model (Note: this function breaks. Fit must always be True)
+
+        Parameters
+        ----------
+        guesses: np.ndarray
+            Initial guesses for your fit
         """
         self.guesses = guesses
         if self.model==1:
@@ -343,6 +412,11 @@ class SpecModel:
     def runEmcee(self, array, progress=True):
         """
         This function runs emcee for the respective spectrum with the respective prior
+
+        Parameters
+        ------------
+        array: list (float)
+            Initial guesses for your fit
         """
         self.ndim= len(array)
         self.nbins=self.ndim * 2
@@ -364,7 +438,7 @@ class SpecModel:
         Continue emcee sampling from where the last run left off
         Parameters
         ----------
-        nsteps <int>
+        nsteps: <int>
             the number of additional steps to run with the current emcee sampler
         '''
         print("Initial steps: {0}".format(self.emcee_ensemble.backend.iteration))
@@ -392,6 +466,11 @@ class SpecModel:
     def rejectFirst(self,steps_to_burn):
         """
         This function removes the first respective number of steps identified
+        
+        Parameters
+        -----------
+        steps_to_burn: int
+            number of steps to reject from total number of steps the walkers take
         """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,stb:,:] 
@@ -401,6 +480,11 @@ class SpecModel:
     def rejectLast(self,steps_to_burn):
         """
         This function removes the last respective number of steps identified
+
+        Parameters
+        -----------
+        steps_to_burn: int
+            number of steps to reject from total number of steps the walkers take
         """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,:stb,:] 

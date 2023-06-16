@@ -872,6 +872,11 @@ class SpectralModel(fitter.SimpleFitter):
     def priorfn(self, priorvals, pars=None):
         """
         Returns the multivariate normal prior of the model.
+
+        Paramaters
+        
+        ---------
+        priorvals: dictionary consisting of steps (int) , mean (float), and covariance (float) of the prior
         """
         prior=scipy.stats.multivariate_normal.pdf(pars , mean=priorvals["mean"], cov=priorvals["cov"])
         return prior
@@ -924,7 +929,7 @@ class SpectralModel(fitter.SimpleFitter):
         error : np.ndarray
         nwalkers : int
             Number of walkers to use
-
+        priorvals: dictionary consisting of steps (int) , mean (float), and covariance (float) of the prior
         Examples
         --------
 

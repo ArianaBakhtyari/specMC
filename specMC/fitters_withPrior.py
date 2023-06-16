@@ -1948,7 +1948,7 @@ class Specfit(interactive.Interactive):
         error : np.ndarray
         nwalkers : int
             Number of walkers to use.  Defaults to 2 * self.fitters.npars
-        priorvals:dictionary consisting of steps (int) , mean(float), and covariance (float)
+        priorvals: dictionary consisting of steps (int) , mean (float), and covariance (float) of the prior
         Examples
         --------
 
