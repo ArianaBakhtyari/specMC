@@ -3,17 +3,22 @@ import corner
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plotCorner(emcee_ensemble, nameOfFile, titles):
-    corner.corner(emcee_ensemble.flatchain);
+def plotCorner(emcee_ensemble, nameOfFile, titles, savename=None):
+    #corner.corner(emcee_ensemble.flatchain);
     plt.figure(corner.corner(emcee_ensemble.flatchain, labels = titles))
-    plt.savefig(f'./Results/{nameOfFile}.png')
+    #savename = f'./Results/{nameOfFile}.png'
+    if savename is not None:
+        plt.savefig(savename)
 
-def plotBurnCorner(flatchain, nameOfFile, titles):
-    corner.corner(flatchain);
+def plotBurnCorner(flatchain, nameOfFile, titles, savename=None):
+    #corner.corner(flatchain);
     plt.figure(corner.corner(flatchain, labels = titles))
-    plt.savefig(f'./Results/{nameOfFile}.png')
+    # f'./Results/{nameOfFile}.png'
+    if savename is not None:
+        plt.savefig(savename)
 
-def plotMSP(emcee_ensemble,titles, nbins):
+
+def plotMSP(emcee_ensemble,titles, nbins, savename=None):
         values=[]
         medVals=[]
         stdVals=[]
@@ -31,9 +36,11 @@ def plotMSP(emcee_ensemble,titles, nbins):
                 plt.hist(values[j],bins=nbins)
                 plt.title(f'{titles[j]} samples')
         plt.tight_layout();
-        plt.savefig("./Results/MedianStdPlots.png")
+        # "./Results/MedianStdPlots.png"
+        if savename is not None:
+                plt.savefig(savename)
 
-def plotSubplots(emcee_ensemble, titles, nameOfFile):
+def plotSubplots(emcee_ensemble, titles, nameOfFile, savename=None):
         walker_to_inspect=0 # index of walker
         median_lnpost = np.median(emcee_ensemble.lnprobability[walker_to_inspect,:])
         plt.figure(figsize=(15,7))
@@ -49,10 +56,12 @@ def plotSubplots(emcee_ensemble, titles, nameOfFile):
         plt.title('Ln Posterior')
         plt.xlabel('Step number')
         plt.tight_layout()
-        plt.savefig(f'./Results/{nameOfFile}.png')
+        # f'./Results/{nameOfFile}.png'
+        if savename is not None:
+                plt.savefig(savename)
 
 
-def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOfFile):
+def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOfFile, savename=None):
         stb = steps_to_burn
         walker_to_inspect=0 # index of walker
         if burn_setting is "before":
@@ -78,4 +87,6 @@ def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOf
         plt.title('Ln Posterior')
         plt.xlabel('Step number')
         plt.tight_layout()
-        plt.savefig(f'./Results/{nameOfFile}.png')
+        if savename is not None:
+                plt.savefig(savename)
+                #plt.savefig(f'./Results/{nameOfFile}.png')
