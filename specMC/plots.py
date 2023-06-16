@@ -6,7 +6,7 @@ import corner
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plotCorner(emcee_ensemble, nameOfFile, titles):
+def plotCorner(emcee_ensemble, nameOfFile, titles, savename=None):
     """ 
     This function plots the original
 
@@ -20,11 +20,13 @@ def plotCorner(emcee_ensemble, nameOfFile, titles):
     titles: array
         array of strings of components for the desired fit
     """
-    corner.corner(emcee_ensemble.flatchain);
+    #corner.corner(emcee_ensemble.flatchain);
     plt.figure(corner.corner(emcee_ensemble.flatchain, labels = titles))
-    plt.savefig(f'./Results/{nameOfFile}.png')
+    #savename = f'./Results/{nameOfFile}.png'
+    if savename is not None:
+        plt.savefig(savename)
 
-def plotBurnCorner(flatchain, nameOfFile, titles):
+def plotBurnCorner(flatchain, nameOfFile, titles, savename=None):
     """
     This function plots the corner plots with the corresponding burn-in values
 
@@ -37,11 +39,16 @@ def plotBurnCorner(flatchain, nameOfFile, titles):
     titles: array
         array of strings of components for the desired fit
     """
-    corner.corner(flatchain);
-    plt.figure(corner.corner(flatchain, labels = titles))
-    plt.savefig(f'./Results/{nameOfFile}.png')
+    #corner.corner(flatchain);
 
-def plotMSP(emcee_ensemble,titles, nbins):
+    plt.figure(corner.corner(flatchain, labels = titles))
+    # f'./Results/{nameOfFile}.png'
+    if savename is not None:
+        plt.savefig(savename)
+
+
+def plotMSP(emcee_ensemble,titles, nbins, savename=None):
+
         """
         This function plots the Median and Standard deviation histograms for each component
 
@@ -55,6 +62,7 @@ def plotMSP(emcee_ensemble,titles, nbins):
         nbins: int
             number of bins 
         """
+
         values=[]
         medVals=[]
         stdVals=[]
@@ -72,9 +80,12 @@ def plotMSP(emcee_ensemble,titles, nbins):
                 plt.hist(values[j],bins=nbins)
                 plt.title(f'{titles[j]} samples')
         plt.tight_layout();
-        plt.savefig("./Results/MedianStdPlots.png")
+        # "./Results/MedianStdPlots.png"
+        if savename is not None:
+                plt.savefig(savename)
 
-def plotSubplots(emcee_ensemble, titles, nameOfFile):
+
+def plotSubplots(emcee_ensemble, titles, nameOfFile, savename=None):
         """
         This function plots each components value with respect to each step
 
@@ -103,10 +114,12 @@ def plotSubplots(emcee_ensemble, titles, nameOfFile):
         plt.title('Ln Posterior')
         plt.xlabel('Step number')
         plt.tight_layout()
-        plt.savefig(f'./Results/{nameOfFile}.png')
+        # f'./Results/{nameOfFile}.png'
+        if savename is not None:
+                plt.savefig(savename)
 
 
-def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOfFile):
+def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOfFile, savename=None):
         """
         This function plots each components value with respect to the remaining steps after rejecting a certain number of steps
 
@@ -149,4 +162,6 @@ def plotBurnSubplots(emcee_ensemble, steps_to_burn, burn_setting, titles, nameOf
         plt.title('Ln Posterior')
         plt.xlabel('Step number')
         plt.tight_layout()
-        plt.savefig(f'./Results/{nameOfFile}.png')
+        if savename is not None:
+                plt.savefig(savename)
+                #plt.savefig(f'./Results/{nameOfFile}.png')

@@ -879,10 +879,6 @@ class SpectralModel(fitter.SimpleFitter):
 
         priorvals: dictionary consisting of steps (int) , mean (float), and covariance (float) of the prior
         """
-        priorvals["steps"]= priorvals["steps"]+1
-        if priorvals["steps"]%1000==0:
-            # print every thousand steps
-            print(priorvals["steps"])
         prior=scipy.stats.multivariate_normal.pdf(pars , mean=priorvals["mean"], cov=priorvals["cov"])
         return prior
 
