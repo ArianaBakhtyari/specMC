@@ -23,9 +23,9 @@ class SpecModel:
 
         -----------
         inFiles: string (path of file)
-            desired datafile to be analyzed
+            desired datafile(s) to be analyzed
         fittype: string
-            desired fit type
+            desired fit type to be performed on dataset
         """
         self.fittype= fittype
         if fittype=='gaussian':
@@ -106,7 +106,7 @@ class SpecModel:
 
         -----------
         guesses: np.ndarray
-            Initial guesses for your fit
+            Initial guesses for the fit passed in by the user
 
         """
         self.ncomp=int(len(guesses)/len(self.titles))
@@ -164,7 +164,19 @@ class SpecModel:
         Parameters
         ------------
         arguments: sys.argv
-            system arguments
+            system arguments consisting of a combination of the following:
+                - fittype- The fittype you'd like for your model
+                - guesses- Initial guesses for your fit
+                - p0- Starting points for your walkers
+                - standard deviation of p0- std for your walkers
+                - prior- The prior for each component
+                - error of prior- The error for each component
+                - y or n for Fitting the model- If you'd like to fit the model
+                - x0- The x coordinate of the pixel you'd like to analyze
+                - y0- The y coordinate of the pixel you'd like to analyze
+                - number of walkers- Number of walkers for mcmc
+                - number of steps- Number of steps you'd like each walker to take
+                - number of steps to reject (Burn)- Number of steps you'd like to reject when analayzing the data (The initial steps are always noisy and inaccurate)
         """
         if len(arguments) <= 5:
             self.getSampleBall()
@@ -284,7 +296,7 @@ class SpecModel:
 
         Parameters
         ----------
-        cubea: spectralcube object
+        cubea: spectralcube object created
         """
         pcubea = pyspeckit.Cube(cube=cubea)
         pcubea.xarr.velocity_convention='radio'
@@ -434,7 +446,7 @@ class SpecModel:
         Continue emcee sampling from where the last run left off
         Parameters
         ----------
-        nsteps <int>
+        nsteps: <int>
             the number of additional steps to run with the current emcee sampler
         '''
         print("Initial steps: {0}".format(self.emcee_ensemble.backend.iteration))
@@ -466,7 +478,7 @@ class SpecModel:
         Parameters
         -----------
         steps_to_burn: int
-            number of steps to reject
+            number of steps to reject from total number of steps the walkers take
         """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,stb:,:] 
@@ -480,7 +492,7 @@ class SpecModel:
         Parameters
         -----------
         steps_to_burn: int
-            number of steps to reject
+            number of steps to reject from total number of steps the walkers take
         """
         stb = steps_to_burn
         self.burned_chain = self.emcee_ensemble.chain[:,:stb,:] 
