@@ -54,7 +54,7 @@ class SpecModel:
             # create a Cube Stack
             cubes = []
             for c in [self.cube1a, self.cube2a]:
-                pcube = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
+                pcube = pyspeckit.Cube(cube=c)  # , xO=self.x0, yO=self.y0)
                 pcube.xarr.velocity_convention = 'radio'
                 pcube.xarr.convert_to_unit("km/s")
                 cubes.append(pcube)
