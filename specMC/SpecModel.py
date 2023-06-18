@@ -15,7 +15,11 @@ from . import plots
 
 class SpecModel:
     """
-    This class creates the specModel object
+    This class creates the specModel object. The object takes specific dataset(s) and creates a spectral cube, analyzing a specific pixel chosen by the user.
+    The functions provided help create many aattributes required to further analyze the data. User prompt functions are included allow users with an easier data
+    entry option. The functions ensure all the data being analyzed has the same units and is of accepted form. Rejection functions are also included to help filter
+    the data to allow for a proper analysis.
+
     """
     def __init__(self, inFiles, fittype):
         """
