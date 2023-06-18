@@ -7,8 +7,10 @@ from spectral_cube import SpectralCube
 import matplotlib.pyplot as plt
 import emcee
 import numpy as np
+
 from .models import ammonia, ammonia_fixfortho
 from .fitters_withPrior import Specfit
+from . import plots
 
 
 class SpecModel:
@@ -58,12 +60,13 @@ class SpecModel:
             # create a Cube Stack
             cubes = []
             for c in [self.cube1a, self.cube2a]:
-                pcube = pyspeckit.Cube(cube=self.cube1a)  # , xO=self.x0, yO=self.y0)
+                pcube = pyspeckit.Cube(cube=c)  # , xO=self.x0, yO=self.y0)
                 pcube.xarr.velocity_convention = 'radio'
                 pcube.xarr.convert_to_unit("km/s")
                 cubes.append(pcube)
 
             self.cubes = pyspeckit.CubeStack(cubes)
+
         
     def getSampleBall(self):
         """
@@ -201,8 +204,8 @@ class SpecModel:
             self.Fit=sys.argv[len(arguments)-6] #fit
             self.x0=int(sys.argv[len(arguments)-5]) #x0
             self.y0=int(sys.argv[len(arguments)-4]) #y0
-            self.Walkers=int(sys.argv[len(arguments)-3]) #walkers
-            self.steps=int(sys.argv[len(arguments)-2]) #steps
+            self.nwalkers=int(sys.argv[len(arguments)-3]) #walkers
+            self.nsteps=int(sys.argv[len(arguments)-2]) #steps
             self.Burn=int(sys.argv[len(arguments)-1]) #burnin
 
     def toAnArrayOfInt(self, inputString):
@@ -277,8 +280,8 @@ class SpecModel:
             except ValueError:
                 print("ERROR. Please enter a valid INTEGER ")
                 pass
-        self.Walkers=walkers
-        self.steps=steps
+        self.nwalkers=walkers
+        self.nsteps=steps
                 
     def createCube(self, inFile):
         """
@@ -413,20 +416,15 @@ class SpecModel:
             cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
             self.sp=cubes
 
-    def runEmcee(self, array, progress=True):
+    def runEmcee(self, guesses, progress=True):
         """
         This function runs emcee for the respective spectrum with the respective prior
 
         Parameters
         ------------
-        array: list (float)
+        guesses: list (float)
             Initial guesses for your fit
         """
-        self.ndim= len(array)
-        self.nbins=self.ndim * 2
-        self.nwalkers=self.Walkers
-        self.nsteps=self.steps
-        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers)
 
         #HARD CODED EXAMPLE: 
         #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
@@ -497,11 +495,13 @@ class SpecModel:
 
     #================================================================================================#
     # wrapper functions
-    def setup_run(self, x, y, guesses, p0, std, prior, error, n_walkers, steps, burnin, fit=True):
+    def setup_run(self, x, y, guesses, p0, std, prior, error, nwalkers, steps, burnin, backend_name=None, read_backend=False, fit=True):
         self.sampleball = []
         self.prior = []
 
         self.findComponents(guesses)
+        self.ndim= len(guesses)
+        self.nbins = self.ndim * 2
 
         self.sampleball.append(p0)  # p0
         self.sampleball.append(std)  # std
@@ -510,9 +510,27 @@ class SpecModel:
         self.Fit = fit  # fit
         self.x0 = int(x)
         self.y0 = int(y)
-        self.Walkers = int(n_walkers)  # walkers
-        self.steps = int(steps)  # steps
+        self.nwalkers = int(nwalkers)  # walkers
+        self.nsteps = int(steps)  # steps
         self.Burn = int(burnin)  # burnin
 
         # get the spectrum at the pixel and perform an initial fit
         self.get_Spectrum(x, y, guesses)
+
+        if backend_name is None:
+            self.backend_name='mcmcresults.h5'
+
+        kwargs = dict(backend_name=backend_name, read_backend=read_backend)
+        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers, **kwargs)
+
+    #================================================================================================#
+    # plotting functions
+
+    def plotCorner(self, savename=None):
+        plots.plotCorner(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, savename=savename)
+
+    def plotMSP(self, savename=None):
+        plots.plotMSP(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, nbins=self.nbins, savename=savename)
+
+    def plotChain(self, savename=None):
+        plots.plotSubplots(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, savename=savename)
