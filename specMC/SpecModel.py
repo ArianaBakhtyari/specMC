@@ -418,7 +418,8 @@ class SpecModel:
 
     def runEmcee(self, guesses, progress=True):
         """
-        This function runs emcee for the respective spectrum with the respective prior
+        This function runs emcee for the respective spectrum with the respective prior. Note that the results are automatically
+        saved usign the backend
 
         Parameters
         ------------
@@ -437,7 +438,8 @@ class SpecModel:
 
     def runEmcee_continue(self, nsteps, progress=True):
         '''
-        Continue emcee sampling from where the last run left off
+        Continue emcee sampling from where the last run left off. Note that the results are automatically saved usign the backend
+
         Parameters
         ----------
         nsteps: <int>
@@ -527,10 +529,23 @@ class SpecModel:
     # plotting functions
 
     def plotCorner(self, savename=None):
-        plots.plotCorner(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, savename=savename)
+        plots.plotCorner(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), savename=savename)
 
     def plotMSP(self, savename=None):
-        plots.plotMSP(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, nbins=self.nbins, savename=savename)
+        plots.plotMSP(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), nbins=self.nbins, savename=savename)
 
     def plotChain(self, savename=None):
-        plots.plotSubplots(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, savename=savename)
+        plots.plotSubplots(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), savename=savename)
+
+    def make_plot_titles(self):
+        # Automatically make plot titles for all the parameters and label their component numbers accordingly
+        titles = self.plotTitles * self.ncomp
+        new_titles = []
+        npars = self.ndim / self.ncomp
+        for i, t in enumerate(titles):
+            # add subscripts for each component
+            i_comp = int(i / npars) + 1
+            nt = t + "$_{," + str(i_comp) + "}$"
+            new_titles.append(nt)
+        return new_titles
+
