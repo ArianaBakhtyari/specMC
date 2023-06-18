@@ -416,20 +416,16 @@ class SpecModel:
             cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
             self.sp=cubes
 
-    def runEmcee(self, guesses, progress=True):
+    def runEmcee(self, progress=True):
         """
         This function runs emcee for the respective spectrum with the respective prior. Note that the results are automatically
         saved usign the backend
 
         Parameters
         ------------
-        guesses: list (float)
-            Initial guesses for your fit
         """
-
         #HARD CODED EXAMPLE: 
         #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
-        #self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nbins) #commented out by mchen
 
         self.p0 = emcee.utils.sample_ball(self.sampleball[0],self.sampleball[1], self.nwalkers)
         print(self.p0.shape)
