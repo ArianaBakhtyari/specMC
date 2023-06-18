@@ -534,8 +534,8 @@ class SpecModel:
     def plotMSP(self, savename=None):
         plots.plotMSP(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), nbins=self.nbins, savename=savename)
 
-    def plotChain(self, savename=None):
-        plots.plotSubplots(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), savename=savename)
+    def plotChain(self, i_walker, savename=None):
+        plots.plotSubplots(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), i_walker=i_walker, savename=savename)
 
     def make_plot_titles(self):
         # Automatically make plot titles for all the parameters and label their component numbers accordingly

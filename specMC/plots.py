@@ -91,7 +91,7 @@ def plotMSP(emcee_ensemble,titles, nbins, savename=None):
                 plt.savefig(savename)
 
 
-def plotSubplots(emcee_ensemble, titles, savename=None):
+def plotSubplots(emcee_ensemble, titles, i_walker=0, savename=None):
         """
         This function plots each components value with respect to each step
 
@@ -104,18 +104,19 @@ def plotSubplots(emcee_ensemble, titles, savename=None):
             array of strings of components for the desired fit
         nameOfFile: string
             desired name of plot
+        i_walker:
+                index of the walker to inspect
         """
-        walker_to_inspect=0 # index of walker
-        median_lnpost = np.median(emcee_ensemble.lnprobability[walker_to_inspect,:])
+        median_lnpost = np.median(emcee_ensemble.lnprobability[i_walker,:])
         plt.figure(figsize=(15,7))
         x=0
         for x, title in enumerate(titles):
                 plt.subplot(2,8,x+1)
-                plt.plot(emcee_ensemble.chain[walker_to_inspect,:,x])
+                plt.plot(emcee_ensemble.chain[i_walker,:,x])
                 plt.title(f'{title}')
                 plt.xlabel('Step number')
         plt.subplot(2,8,6)
-        plt.plot(emcee_ensemble.lnprobability[walker_to_inspect,:])
+        plt.plot(emcee_ensemble.lnprobability[i_walker,:])
         plt.axhline(median_lnpost,color='red', linestyle='--')
         plt.title('Ln Posterior')
         plt.xlabel('Step number')
