@@ -60,6 +60,7 @@ class SpecModel:
                 cubes.append(pcube)
 
             self.cubes = pyspeckit.CubeStack(cubes)
+
         
     def getSampleBall(self):
         """
@@ -197,8 +198,8 @@ class SpecModel:
             self.Fit=sys.argv[len(arguments)-6] #fit
             self.x0=int(sys.argv[len(arguments)-5]) #x0
             self.y0=int(sys.argv[len(arguments)-4]) #y0
-            self.Walkers=int(sys.argv[len(arguments)-3]) #walkers
-            self.steps=int(sys.argv[len(arguments)-2]) #steps
+            self.nwalkers=int(sys.argv[len(arguments)-3]) #walkers
+            self.nsteps=int(sys.argv[len(arguments)-2]) #steps
             self.Burn=int(sys.argv[len(arguments)-1]) #burnin
 
     def toAnArrayOfInt(self, inputString):
@@ -273,8 +274,8 @@ class SpecModel:
             except ValueError:
                 print("ERROR. Please enter a valid INTEGER ")
                 pass
-        self.Walkers=walkers
-        self.steps=steps
+        self.nwalkers=walkers
+        self.nsteps=steps
                 
     def createCube(self, inFile):
         """
@@ -409,20 +410,22 @@ class SpecModel:
             cubes = pyspeckit.CubeStack([pcube1a, pcube2a])
             self.sp=cubes
 
-    def runEmcee(self, array, progress=True):
+    def runEmcee(self, guesses, progress=True):
         """
         This function runs emcee for the respective spectrum with the respective prior
 
         Parameters
         ------------
-        array: list (float)
+        guesses: list (float)
             Initial guesses for your fit
         """
-        self.ndim= len(array)
-        self.nbins=self.ndim * 2
-        self.nwalkers=self.Walkers
-        self.nsteps=self.steps
-        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers)
+        #self.ndim= len(guesses) # may still be needed
+
+        #self.nbins=self.ndim * 2 # may still be needed
+        #self.nwalkers=self.Walkers
+        #self.nsteps=self.steps
+
+        # self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers) m ay still be needed
 
         #HARD CODED EXAMPLE: 
         #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
@@ -493,11 +496,13 @@ class SpecModel:
 
     #================================================================================================#
     # wrapper functions
-    def setup_run(self, x, y, guesses, p0, std, prior, error, n_walkers, steps, burnin, fit=True):
+    def setup_run(self, x, y, guesses, p0, std, prior, error, nwalkers, steps, burnin, backend_name=None, read_backend=False, fit=True):
         self.sampleball = []
         self.prior = []
 
         self.findComponents(guesses)
+        self.ndim= len(guesses)
+        self.nbins = self.ndim * 2
 
         self.sampleball.append(p0)  # p0
         self.sampleball.append(std)  # std
@@ -506,9 +511,15 @@ class SpecModel:
         self.Fit = fit  # fit
         self.x0 = int(x)
         self.y0 = int(y)
-        self.Walkers = int(n_walkers)  # walkers
-        self.steps = int(steps)  # steps
+        self.nwalkers = int(nwalkers)  # walkers
+        self.nsteps = int(steps)  # steps
         self.Burn = int(burnin)  # burnin
 
         # get the spectrum at the pixel and perform an initial fit
         self.get_Spectrum(x, y, guesses)
+
+        if backend_name is None:
+            self.backend_name='mcmcresults.h5'
+
+        kwargs = dict(backend_name=backend_name, read_backend=read_backend)
+        self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers, **kwargs)
