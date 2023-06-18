@@ -513,6 +513,10 @@ class SpecModel:
         self.x0 = int(x)
         self.y0 = int(y)
         self.nwalkers = int(nwalkers)  # walkers
+        if self.nwalkers < self.nbins:
+            print("[WARNING]: the number of walkers are less than"
+                  " twice the number of parameters. {} walkers are used instead".format(self.nbins))
+            self.nwalkers = self.nbins
         self.nsteps = int(steps)  # steps
         self.Burn = int(burnin)  # burnin
 
