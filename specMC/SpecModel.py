@@ -528,8 +528,14 @@ class SpecModel:
     #================================================================================================#
     # plotting functions
 
-    def plotCorner(self, savename=None):
-        plots.plotCorner(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), savename=savename)
+    def plotCorner(self, n_reject=None, savename=None):
+        # n_reject is the number of steps to reject
+        if n_reject is None:
+            # plot all the steps
+            plots.plotCorner(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), savename=savename)
+        else:
+            self.rejectFirst(n_reject)
+            plots.plotBurnCorner(self.burned_flatchain, titles=self.make_plot_titles(), savename=savename)
 
     def plotMSP(self, savename=None):
         plots.plotMSP(emcee_ensemble=self.emcee_ensemble, titles=self.make_plot_titles(), nbins=self.nbins, savename=savename)
