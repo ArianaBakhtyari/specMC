@@ -7,8 +7,10 @@ from spectral_cube import SpectralCube
 import matplotlib.pyplot as plt
 import emcee
 import numpy as np
+
 from .models import ammonia, ammonia_fixfortho
 from .fitters_withPrior import Specfit
+from . import plots
 
 
 class SpecModel:
@@ -419,13 +421,6 @@ class SpecModel:
         guesses: list (float)
             Initial guesses for your fit
         """
-        #self.ndim= len(guesses) # may still be needed
-
-        #self.nbins=self.ndim * 2 # may still be needed
-        #self.nwalkers=self.Walkers
-        #self.nsteps=self.steps
-
-        # self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers) m ay still be needed
 
         #HARD CODED EXAMPLE: 
         #self.p0 = emcee.utils.sample_ball((10, 5.3, 25,0.13, 8.16, 10, 5.3, 25, 0.13, 8.16),(3, 1, 2, 0.026, 0.051, 3, 1, 2, 0.026, 0.051), self.nbins*2)
@@ -523,3 +518,15 @@ class SpecModel:
 
         kwargs = dict(backend_name=backend_name, read_backend=read_backend)
         self.emcee_ensemble = Specfit.get_emcee(self.sp.specfit, self.proto_gauss_prior(), self.nwalkers, **kwargs)
+
+    #================================================================================================#
+    # plotting functions
+
+    def plotCorner(self, savename=None):
+        plots.plotCorner(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, savename=savename)
+
+    def plotMSP(self, savename=None):
+        plots.plotMSP(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, nbins=self.nbins, savename=savename)
+
+    def plotChain(self, savename=None):
+        plots.plotSubplots(emcee_ensemble=self.emcee_ensemble, titles=self.plotTitles, savename=savename)

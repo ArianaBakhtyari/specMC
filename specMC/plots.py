@@ -13,7 +13,7 @@ import corner
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plotCorner(emcee_ensemble, nameOfFile, titles, savename=None):
+def plotCorner(emcee_ensemble, titles, savename=None):
     """ 
     This function plots the original corner plot
 
@@ -32,7 +32,7 @@ def plotCorner(emcee_ensemble, nameOfFile, titles, savename=None):
     if savename is not None:
         plt.savefig(savename)
 
-def plotBurnCorner(flatchain, nameOfFile, titles, savename=None):
+def plotBurnCorner(flatchain, titles, savename=None):
     """
     This function plots the corner plots with the corresponding burn-in values. 
 
@@ -91,7 +91,7 @@ def plotMSP(emcee_ensemble,titles, nbins, savename=None):
                 plt.savefig(savename)
 
 
-def plotSubplots(emcee_ensemble, titles, nameOfFile, savename=None):
+def plotSubplots(emcee_ensemble, titles, savename=None):
         """
         This function plots each components value with respect to each step
 
