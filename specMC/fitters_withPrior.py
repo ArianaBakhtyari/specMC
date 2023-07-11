@@ -1938,7 +1938,7 @@ class Specfit(interactive.Interactive):
         else:
             raise AttributeError("Fitter %r does not have pymc implemented." % self.fitter)
 
-    def get_emcee(self, priorvals, nwalkers=None,  **kwargs):
+    def get_emcee(self, priorvals, nwalkers=None, **kwargs):
         """
         Get an emcee walker ensemble for the data & model using the current model type
 
@@ -1948,6 +1948,8 @@ class Specfit(interactive.Interactive):
         error : np.ndarray
         nwalkers : int
             Number of walkers to use.  Defaults to 2 * self.fitters.npars
+        **kwargs :
+            Additional arguments to be passed into model_withPrior.SpectralModel.get_emcee_ensemblesampler()
         priorvals: dictionary consisting of steps (int) , mean (float), and covariance (float) of the prior
         Examples
         --------
@@ -1971,7 +1973,7 @@ class Specfit(interactive.Interactive):
             emc =spectral_Mod.get_emcee_ensemblesampler(self.fitter, self.Spectrum.xarr,
 
                                                         self.spectofit,
-                                                        self.errspec, nwalkers, priorvals)
+                                                        self.errspec, nwalkers, priorvals, **kwargs)
             emc.nwalkers = nwalkers
             emc.p0 = np.array([self.parinfo.values] * emc.nwalkers)
             return emc
